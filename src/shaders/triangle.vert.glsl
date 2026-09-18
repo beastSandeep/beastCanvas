@@ -5,7 +5,7 @@
 attribute vec2 a_position;
 
 void main() {
-  vec2 position = rotate(a_position, PI * 0.5);
+  vec2 position = rotate(a_position, PI * .8);
 
   gl_Position = vec4(position, 0.0, 1.0);
 }
