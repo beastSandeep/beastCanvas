@@ -5,20 +5,48 @@ import "./style.css";
 
 // 800 X 600
 const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
-const gl = canvas.getContext("webgl")!;
+const gl: WebGLRenderingContext = canvas.getContext("webgl")!;
 
-// setting color buffer
-gl.clearColor(0.2, 0.4, 0.55, 1.0);
-// Clear <canvas>
+gl.clearColor(0, 0, 0, 1);
 gl.clear(gl.COLOR_BUFFER_BIT);
 
-const savedColor = gl.getParameter(gl.COLOR_CLEAR_VALUE);
-console.log(savedColor); // Output: Float32Array [0.2, 0.4, 0.55, 1]
 
-gl.clearColor(0.5, 0.7, 0.2, 1.0);
+const vertexShaderSource = `
+  attribute vec4 att_Position; // getting attribute from JS
+  
+  void main() {
+    gl_Position = att_Position;
+    gl_PointSize = 20.0;
+  }
+`
+const fragmentShaderSource = `
+  void main() {
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+  }
+`
 
-setTimeout(() => {
-  const savedColor = gl.getParameter(gl.COLOR_CLEAR_VALUE);
-  console.log(savedColor); // Output: Float32Array [0.2, 0.4, 0.55, 1]
-  gl.clear(gl.COLOR_BUFFER_BIT);
-}, 2000);
+const vertexShader = gl.createShader(gl.VERTEX_SHADER)!;
+gl.shaderSource(vertexShader, vertexShaderSource);
+gl.compileShader(vertexShader);
+
+const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)!;
+gl.shaderSource(fragmentShader, fragmentShaderSource);
+gl.compileShader(fragmentShader);
+
+const program = gl.createProgram();
+gl.attachShader(program, vertexShader);
+gl.attachShader(program, fragmentShader);
+
+gl.linkProgram(program);
+gl.useProgram(program);
+
+// Get the storage location of attribute variable
+const a_Position = gl.getAttribLocation(program, 'att_Position')
+
+// Pass vertex position to attribute variable
+gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0);
+
+
+gl.drawArrays(gl.POINTS, 0, 1)
+
+
